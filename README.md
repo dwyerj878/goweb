@@ -18,11 +18,22 @@ uses gin
 
 ### sample payloads
 
-curl -X POST 127.0.0.1:3000/encrypt --data '{"text" : "some text", "key" : "passphrasewhichneedstobe32bytes!" } '
+#### encrypt data
 
-curl -X POST 127.0.0.1:3000/decrypt --data '{"text" : "JsBtosJ3BqMQW9GsX0sWntFsvlI3cq422uyF4XUzKj84HN/etQ==", "key" : "passphrasewhichneedstobe32bytes!" } '
+`curl -X POST 127.0.0.1:3000/encrypt --data '{"text" : "some text", "key" : "passphrasewhichneedstobe32bytes!" } '`
 
- curl -v -X POST 127.0.0.1:3000/decrypt --data '{"texxxt" : "JsBtosJ3BqMQW9GsX0sWntFsvlI3cq422uyF4XUzKj84HN/etQ==" } '
+#### decrypt data
+
+`curl -X POST 127.0.0.1:3000/decrypt --data '{"text" : "JsBtosJ3BqMQW9GsX0sWntFsvlI3cq422uyF4XUzKj84HN/etQ==", "key" : "passphrasewhichneedstobe32bytes!" } '`
+
+#### decrypt fail
+
+ `curl -v -X POST 127.0.0.1:3000/decrypt --data '{"texxxt" : "JsBtosJ3BqMQW9GsX0sWntFsvlI3cq422uyF4XUzKj84HN/etQ==" } '`
+
+ #### get settings
+
+ `curl -X GET 127.0.01:3000/keys`
+
 
 
 ## Swagger impl
