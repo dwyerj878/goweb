@@ -13,7 +13,7 @@ uses gin
 * ~~implement redis/valkey~~
 * implement redis/valkey settings
 * implement mongo
-* implement swagger/openapi
+* ~~implement swagger/openapi~~
 
 
 ### sample payloads

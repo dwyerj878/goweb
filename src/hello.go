@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	docs "hello/docs"
 	"hello/enc"
 	"hello/vks"
 	"log"
@@ -9,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"rsc.io/quote"
 )
 
@@ -17,10 +20,12 @@ type URI struct {
 }
 
 func main() {
+	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	log.Println(quote.Go())
 	engine := gin.New()
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	engine.GET("/test/:details", test_route)
 
 	engine.POST("/encrypt", encrypt_route)
@@ -37,6 +42,15 @@ func get_keys_route(context *gin.Context) {
 	context.JSON(http.StatusAccepted, "OK")
 }
 
+// PingExample godoc
+// @Summary ping example
+// @Schemes
+// @Description do ping
+// @Tags example
+// @Accept json
+// @Produce json
+// @Success 200 {string} Helloworld
+// @Router /test [get]
 func test_route(context *gin.Context) {
 	uri := URI{}
 	log.Println("test")
@@ -48,6 +62,11 @@ func test_route(context *gin.Context) {
 	context.JSON(http.StatusAccepted, &uri)
 }
 
+// @Accept json
+// @Produce json
+// @Param object body enc.REQUEST true "values to encrypt"
+// @Success 200 {object} enc.RESPONSE
+// @Router /encrypt [post]
 func encrypt_route(context *gin.Context) {
 	log.Println("encrypt")
 	request, err := context_to_request(context)
@@ -58,6 +77,12 @@ func encrypt_route(context *gin.Context) {
 	context.JSON(http.StatusAccepted, &response)
 }
 
+// @Accept json
+// @Produce json
+// @Param object body enc.REQUEST true "values to decrypt"
+// @Success 200 {object} enc.RESPONSE
+// @Failure      400  {string}  "Bad Request Error"
+// @Router /decrypt [post]
 func decrypt_route(context *gin.Context) {
 	log.Println("decrypt")
 	request, err := context_to_request(context)

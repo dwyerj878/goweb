@@ -1,0 +1,72 @@
+definitions:
+  enc.REQUEST:
+    properties:
+      key:
+        type: string
+      text:
+        type: string
+    type: object
+  enc.RESPONSE:
+    properties:
+      result:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /decrypt:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: values to decrypt
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/enc.REQUEST'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/enc.RESPONSE'
+        "400":
+          description: Bad Request Error
+          schema:
+            type: string
+  /encrypt:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: values to encrypt
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/enc.REQUEST'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/enc.RESPONSE'
+  /test:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - example
+swagger: "2.0"
