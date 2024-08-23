@@ -14,6 +14,8 @@ uses gin
 * implement redis/valkey settings
 * implement mongo
 * ~~implement swagger/openapi~~
+* implement authentication
+* add ssl/tls
 
 
 ### sample payloads
@@ -36,9 +38,17 @@ uses gin
 
 
 
-## Swagger impl
+## Swagger implementation
 
 see [https://github.com/swaggo/gin-swagger]
+
+### generate swagger 
+
+`~/go/bin/swag init -g hello.go`
+
+### swagger URL
+
+`http://127.0.0.1:3000/swagger/index.html`
 
 ## VSCode
 
