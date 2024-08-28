@@ -14,10 +14,8 @@ type KEY struct {
 }
 
 func GetValues() []KEY {
-	var cfg config.Config
-	config.Read_env(&cfg)
 
-	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{cfg.ValkeyHost}})
+	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{config.Get_config().ValkeyHost}})
 	if err != nil {
 		panic(err)
 	}

@@ -16,7 +16,7 @@ uses gin
 * ~~implement swagger/openapi~~
 * implement authentication
 * add ssl/tls
-
+* re-implement settings as a singleton
 
 ### sample payloads
 
