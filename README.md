@@ -4,21 +4,26 @@
 
 ## Web API
 
-uses gin
+uses 
+* gin
+* valkey
+* mongo
 
-### ToDo
 
-* ~~implement gin~~
-* ~~implement env variable settings~~
-* ~~implement redis/valkey~~
-* implement redis/valkey settings
-* implement mongo
-* ~~implement swagger/openapi~~
-* implement authentication
-* add ssl/tls
-* re-implement settings as a singleton
+### ToDo / Roadmap
 
-### sample payloads
+- [x] implement gin
+- [x] implement env variable settings
+- [x] implement redis/valkey
+- [ ] implement redis/valkey settings
+- [ ] implement mongo
+- [x] implement swagger/openapi
+- [ ] implement authentication
+- [ ] add ssl/tls
+- [ ] re-implement settings as a singleton
+- [ ] add api testing with mocks and or test containers
+
+### Sample payloads
 
 #### encrypt data
 
@@ -54,6 +59,8 @@ see [https://github.com/swaggo/gin-swagger]
 
 ### launch.json
 
+assumes mongo and valkey running locally
+
 ```
 {
     // Use IntelliSense to learn about possible attributes.
@@ -78,3 +85,17 @@ see [https://github.com/swaggo/gin-swagger]
     ]
 }
 ```
+
+### docker setup
+
+docker run --name valkey -d -p 6379:6379 valkey/valkey
+
+docker run --name mongodb -d -p 27017:27017 mongo
+
+
+### docker start 
+
+docker restart valkey
+
+docker restart mongodb
+
