@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"hello/db"
 	docs "hello/docs"
 	"hello/enc"
 	"hello/vks"
@@ -33,6 +34,8 @@ func main() {
 	engine.POST("/decrypt", decrypt_route)
 
 	engine.GET("/keys", get_keys_route)
+
+	engine.POST("/user", add_user_route)
 	// TODO - change to RunTLS
 	engine.Run(":3000")
 }
@@ -91,6 +94,35 @@ func decrypt_route(context *gin.Context) {
 	}
 	response := request.Decrypt()
 	context.JSON(http.StatusAccepted, &response)
+}
+
+// @Accept json
+// @Produce json
+// @Param object body user.USER true "values to encrypt"
+// @Success 200 {object} db.USER
+// @Router /encrypt [post]
+func add_user_route(context *gin.Context) {
+	log.Println("create user")
+	user := db.USER{}
+
+	if err := context.BindJSON(&user); err != nil {
+		context.AbortWithError(http.StatusBadRequest, errors.New("cannot read value"))
+		return
+	}
+
+	if user.PlainTextPassword == "" {
+		context.AbortWithError(http.StatusBadRequest, errors.New("must provide plain text password"))
+	}
+	if user.FullName == "" {
+		context.AbortWithError(http.StatusBadRequest, errors.New("must provide Full Name"))
+	}
+	if user.UserName == "" {
+		context.AbortWithError(http.StatusBadRequest, errors.New("must provide user name"))
+	}
+
+	db.Create_user(&user)
+	context.JSON(http.StatusAccepted, &user)
+
 }
 
 func context_to_request(context *gin.Context) (enc.REQUEST, *gin.Error) {
