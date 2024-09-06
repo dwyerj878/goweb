@@ -5,6 +5,8 @@ import (
 	"hello/config"
 	"log"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -39,7 +41,12 @@ func Create_user(user *USER) {
 	if err != nil {
 		panic(err)
 	}
-	// TODO - encrypt plain text password int password and remove
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.PlainTextPassword), 14)
+	if err != nil {
+		panic(err)
+	}
+
 	defer client.Disconnect(context.TODO())
 
 	col := client.Database("go_app").Collection("users")
@@ -49,7 +56,7 @@ func Create_user(user *USER) {
 			{Key: "user_name", Value: user.UserName},
 			{Key: "password", Value: user.Password},
 			{Key: "full_name", Value: user.FullName},
-			{Key: "plain_text_password", Value: user.PlainTextPassword}})
+			{Key: "password", Value: bytes}})
 
 	if err != nil {
 		log.Println(err.Error())

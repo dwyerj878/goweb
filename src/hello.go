@@ -112,12 +112,15 @@ func add_user_route(context *gin.Context) {
 
 	if user.PlainTextPassword == "" {
 		context.AbortWithError(http.StatusBadRequest, errors.New("must provide plain text password"))
+		return
 	}
 	if user.FullName == "" {
 		context.AbortWithError(http.StatusBadRequest, errors.New("must provide Full Name"))
+		return
 	}
 	if user.UserName == "" {
 		context.AbortWithError(http.StatusBadRequest, errors.New("must provide user name"))
+		return
 	}
 
 	db.Create_user(&user)
