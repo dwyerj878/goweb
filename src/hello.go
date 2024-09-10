@@ -36,6 +36,7 @@ func main() {
 	engine.GET("/keys", get_keys_route)
 
 	engine.POST("/user", add_user_route)
+	engine.GET("/user/:username", get_user_route)
 	// TODO - change to RunTLS
 	engine.Run(":3000")
 }
@@ -96,6 +97,17 @@ func decrypt_route(context *gin.Context) {
 	context.JSON(http.StatusAccepted, &response)
 }
 
+func get_user_route(context *gin.Context) {
+	log.Println("create user")
+	username := context.Params.ByName("username")
+	user, err := db.Get_user(username)
+	if err != nil {
+		context.AbortWithError(http.StatusNotFound, err)
+		return
+	}
+	context.JSON(http.StatusOK, &user)
+}
+
 // @Accept json
 // @Produce json
 // @Param object body user.USER true "values to encrypt"
@@ -123,8 +135,12 @@ func add_user_route(context *gin.Context) {
 		return
 	}
 
-	db.Create_user(&user)
-	context.JSON(http.StatusAccepted, &user)
+	created, err := db.Create_user(&user)
+	if err != nil {
+		context.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	context.JSON(http.StatusAccepted, &created)
 
 }
 

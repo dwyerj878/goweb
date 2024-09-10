@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"hello/config"
 	"log"
 
@@ -13,13 +14,13 @@ import (
 )
 
 type USER struct {
-	UserName          string `json:"user_name"`
-	Password          string `json:"password"`
-	FullName          string `json:"full_name"`
-	PlainTextPassword string `json:"plain_text_password"`
+	UserName          string `json:"user_name" bson:"user_name"`
+	Password          string `json:"-" bson:"password"`
+	FullName          string `json:"full_name" bson:"full_name"`
+	PlainTextPassword string `json:"plain_text_password" bson:"-"`
 }
 
-func Get_user(username string) {
+func Get_user(username string) (USER, error) {
 	mongoUrl := config.Get_config().MongoHost
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoUrl))
 
@@ -28,18 +29,26 @@ func Get_user(username string) {
 	}
 
 	defer client.Disconnect(context.TODO())
-	var result bson.M
+	var user USER
 	col := client.Database("go_app").Collection("users")
-	col.FindOne(context.TODO(), bson.D{{Key: "username", Value: username}}).Decode(&result)
+	err = col.FindOne(context.TODO(), bson.D{{Key: "user_name", Value: username}}).Decode(&user)
+	return user, err
 }
 
-func Create_user(user *USER) {
+func Create_user(user *USER) (USER, error) {
 	log.Println("Creating user ", user.UserName)
 	mongoUrl := config.Get_config().MongoHost
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoUrl))
-
 	if err != nil {
 		panic(err)
+	}
+
+	col := client.Database("go_app").Collection("users")
+
+	var found USER
+	err = col.FindOne(context.TODO(), bson.D{{Key: "user_name", Value: user.UserName}}).Decode(&found)
+	if err == nil {
+		return *user, errors.New("user exists")
 	}
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(user.PlainTextPassword), 14)
@@ -49,12 +58,10 @@ func Create_user(user *USER) {
 
 	defer client.Disconnect(context.TODO())
 
-	col := client.Database("go_app").Collection("users")
 	result, err := col.InsertOne(
 		context.TODO(),
 		bson.D{
 			{Key: "user_name", Value: user.UserName},
-			{Key: "password", Value: user.Password},
 			{Key: "full_name", Value: user.FullName},
 			{Key: "password", Value: bytes}})
 
@@ -62,4 +69,5 @@ func Create_user(user *USER) {
 		log.Println(err.Error())
 	}
 	log.Println("Created user ", user.UserName, result.InsertedID)
+	return *user, nil
 }
