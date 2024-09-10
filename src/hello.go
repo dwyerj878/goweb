@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"hello/db"
 	docs "hello/docs"
@@ -36,9 +37,29 @@ func main() {
 	engine.GET("/keys", get_keys_route)
 
 	engine.POST("/user", add_user_route)
-	engine.GET("/user/:username", get_user_route)
+	engine.GET("/user/:username", authenticate, get_user_route)
 	// TODO - change to RunTLS
 	engine.Run(":3000")
+}
+
+func authenticate(context *gin.Context) {
+	authHeader := context.GetHeader("Authorization")
+	authType := strings.Split(authHeader, " ")
+	if strings.EqualFold(authType[0], "basic") {
+		creds, err := base64.StdEncoding.DecodeString(authType[1])
+		if err != nil {
+			context.AbortWithError(http.StatusUnauthorized, err)
+			return
+		}
+		username_password := strings.Split(string(creds), ":")
+		user, autherr := db.Authenticate(username_password[0], username_password[1])
+		if autherr != nil {
+			context.AbortWithError(http.StatusUnauthorized, autherr)
+			return
+		}
+		context.Set("currentUser", user)
+		context.Next()
+	}
 }
 
 func get_keys_route(context *gin.Context) {
@@ -72,6 +93,7 @@ func test_route(context *gin.Context) {
 // @Success 200 {object} enc.RESPONSE
 // @Router /encrypt [post]
 func encrypt_route(context *gin.Context) {
+
 	log.Println("encrypt")
 	request, err := context_to_request(context)
 	if err != nil {
@@ -98,7 +120,7 @@ func decrypt_route(context *gin.Context) {
 }
 
 func get_user_route(context *gin.Context) {
-	log.Println("create user")
+	log.Println("get user")
 	username := context.Params.ByName("username")
 	user, err := db.Get_user(username)
 	if err != nil {

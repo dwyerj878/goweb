@@ -35,6 +35,29 @@ func Get_user(username string) (USER, error) {
 	return user, err
 }
 
+func Authenticate(username string, password string) (USER, error) {
+	mongoUrl := config.Get_config().MongoHost
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoUrl))
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer client.Disconnect(context.TODO())
+	var user USER
+	col := client.Database("go_app").Collection("users")
+	err = col.FindOne(context.TODO(), bson.D{{Key: "user_name", Value: username}}).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+
+	if auth_err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); auth_err != nil {
+		return user, auth_err
+	}
+
+	return user, nil
+}
+
 func Create_user(user *USER) (USER, error) {
 	log.Println("Creating user ", user.UserName)
 	mongoUrl := config.Get_config().MongoHost
