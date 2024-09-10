@@ -16,12 +16,14 @@ uses
 - [x] implement env variable settings
 - [x] implement redis/valkey
 - [ ] implement redis/valkey settings
-- [ ] implement mongo
+- [x] implement mongo
 - [x] implement swagger/openapi
-- [ ] implement authentication
+- [x] implement authentication
 - [ ] add ssl/tls
 - [ ] re-implement settings as a singleton
 - [ ] add api testing with mocks and or test containers
+- [ ] add otel metrics/tracing
+- [ ] add custom logging with trac/span id
 
 ### Sample payloads
 
@@ -40,6 +42,14 @@ uses
  #### get settings
 
  `curl -X GET 127.0.01:3000/keys`
+
+#### create user
+
+`POST': curl -v -X POST 127.0.0.1:3000/user --data '{"user_name" : "fred2", "plain_text_password" : "password", "full_name" : "fred bear" }'`
+
+#### use protected route with above credentials
+
+`curl -v -X GET 127.0.0.1:3000/user/fredxx --header 'Authorization:Basic ZnJlZDI6cGFzc3dvcmQ='`
 
 
 
