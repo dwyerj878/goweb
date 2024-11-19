@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"hello/db"
-	docs "hello/docs"
+	"hello/docs"
 	"hello/enc"
 	"hello/vks"
 	"log"
@@ -22,7 +22,7 @@ type URI struct {
 }
 
 func main() {
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.BasePath = "/"
 
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	log.Println(quote.Go())
@@ -39,7 +39,7 @@ func main() {
 	engine.POST("/user", add_user_route)
 	engine.GET("/user/:username", authenticate, get_user_route)
 	// TODO - change to RunTLS
-	engine.Run(":3000")
+	engine.RunTLS(":3000", "certs/cert.pem", "certs/key.pem")
 }
 
 func authenticate(context *gin.Context) {
@@ -59,9 +59,15 @@ func authenticate(context *gin.Context) {
 		}
 		context.Set("currentUser", user)
 		context.Next()
+	} else {
+		context.AbortWithError(http.StatusUnauthorized, errors.New("authentication failed"))
+		return
 	}
 }
 
+// @Produce json
+// @Success 202 {string} Ok
+// @Router /keys [get]
 func get_keys_route(context *gin.Context) {
 	vks.GetValues()
 	context.JSON(http.StatusAccepted, "OK")
@@ -107,7 +113,7 @@ func encrypt_route(context *gin.Context) {
 // @Produce json
 // @Param object body enc.REQUEST true "values to decrypt"
 // @Success 200 {object} enc.RESPONSE
-// @Failure      400  {string}  "Bad Request Error"
+// @Failure 400  {string}  "Bad Request Error"
 // @Router /decrypt [post]
 func decrypt_route(context *gin.Context) {
 	log.Println("decrypt")
@@ -119,6 +125,10 @@ func decrypt_route(context *gin.Context) {
 	context.JSON(http.StatusAccepted, &response)
 }
 
+// @Produce json
+// @Param username path string true "User to get"
+// @Success 200 {object} db.USER
+// @Router /user/{username} [get]
 func get_user_route(context *gin.Context) {
 	log.Println("get user")
 	username := context.Params.ByName("username")
@@ -132,9 +142,9 @@ func get_user_route(context *gin.Context) {
 
 // @Accept json
 // @Produce json
-// @Param object body user.USER true "values to encrypt"
+// @Param object body db.USER true "values to encrypt"
 // @Success 200 {object} db.USER
-// @Router /encrypt [post]
+// @Router /user [post]
 func add_user_route(context *gin.Context) {
 	log.Println("create user")
 	user := db.USER{}

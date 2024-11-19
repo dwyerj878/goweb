@@ -1,4 +1,13 @@
 definitions:
+  db.USER:
+    properties:
+      full_name:
+        type: string
+      plain_text_password:
+        type: string
+      user_name:
+        type: string
+    type: object
   enc.REQUEST:
     properties:
       key:
@@ -54,6 +63,15 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/enc.RESPONSE'
+  /keys:
+    get:
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
   /test:
     get:
       consumes:
@@ -69,4 +87,37 @@ paths:
       summary: ping example
       tags:
       - example
+  /user:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: values to encrypt
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/db.USER'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.USER'
+  /user/{username}:
+    get:
+      parameters:
+      - description: User to get
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.USER'
 swagger: "2.0"

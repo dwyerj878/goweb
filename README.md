@@ -49,7 +49,7 @@ uses
 
 #### use protected route with above credentials
 
-`curl -v -X GET 127.0.0.1:3000/user/fredxx --header 'Authorization:Basic ZnJlZDI6cGFzc3dvcmQ='`
+`curl -v -X GET http://127.0.0.1:3000/user/fred2 --header 'Authorization:Basic ZnJlZDI6cGFzc3dvcmQ='`
 
 
 
@@ -109,3 +109,12 @@ docker restart valkey
 
 docker restart mongodb
 
+
+## create self signed cert
+
+
+####
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365
+
+#### non-interactive and 10 years expiration
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
