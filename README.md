@@ -10,6 +10,7 @@ uses
 * mongo
 
 
+
 ### ToDo / Roadmap
 
 - [x] implement gin
@@ -22,6 +23,7 @@ uses
 - [ ] add ssl/tls
 - [ ] re-implement settings as a singleton
 - [ ] add api testing with mocks and or test containers
+- [ ] find a different data store .. mongo is way too heavy
 
 ### Sample payloads
 
